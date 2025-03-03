@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info3</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="timer" id="timer">00:00:00</div>
+    <h1>Info3</h1>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <div class="container">
+        <div class="nav-bar" id="nav-bar"></div>
+        <div class="quiz-content">
+            <div id="question-container" class="question"></div>
+            <div id="answers-container" class="answers"></div>
+            <p id="error-message" class="error-message">Ne možete izabrati više od dozvoljenog broja odgovora!</p>
+            <div class="navigation">
+                <button id="prev-btn" class="hidden">Previuos</button>
+                <button id="next-btn" class="hidden">Next</button>
+                <button id="show-result" class="hidden">Show result</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let seconds = 0;
+        function updateTimer() {
+            seconds++;
+            let hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            let mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+            let secs = String(seconds % 60).padStart(2, '0');
+            document.getElementById('timer').textContent = `${hrs}:${mins}:${secs}`;
+        }
+        setInterval(updateTimer, 1000);
+        
+        const questions = Array.from({ length: 4 }, (_, i) => ({
+            question: `Pitanje ${i + 1}`,
+            answers: Array.from({ length: Math.floor(Math.random() * 7) + 2 }, (_, j) => (j + 1).toString()).sort(() => Math.random() - 0.5)
+        }));
+
+        let currentQuestionIndex = 0;
+        let selectedAnswers = new Array(questions.length).fill(null);
+        const questionContainer = document.getElementById("question-container");
+        const answersContainer = document.getElementById("answers-container");
+        const nextButton = document.getElementById("next-btn");
+        const prevButton = document.getElementById("prev-btn");
+        const showResultButton = document.getElementById("show-result");
+        const navBar = document.getElementById("nav-bar");
+        const errorMessage = document.getElementById("error-message");
+        const progressBar = document.getElementById("progress");
+        
+        function setupNavBar() {
+            questions.forEach((_, index) => {
+                const btn = document.createElement("button");
+                btn.textContent = index + 1;
+                btn.onclick = () => goToQuestion(index);
+                navBar.appendChild(btn);
+            });
+            updateNavBar();
+        }
+        
+        function updateNavBar() {
+            [...navBar.children].forEach((btn, index) => {
+                btn.classList.toggle("active", index === currentQuestionIndex);
+                btn.classList.toggle("answered", selectedAnswers[index] && selectedAnswers[index].length > 0);
+            });
+        }
+        
+        function updateProgressBar() {
+            const answeredCount = selectedAnswers.filter(ans => ans && ans.length > 0).length;
+            progressBar.style.width = `${(answeredCount / questions.length) * 100}%`;
+        }
+        
+        function showQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionContainer.textContent = q.question;
+            answersContainer.innerHTML = "";
+            errorMessage.style.display = "none";
+            
+            q.answers.forEach((answer, index) => {
+                const button = document.createElement("button");
+                button.textContent = answer;
+                button.onclick = () => selectAnswer(index, button);
+                if (selectedAnswers[currentQuestionIndex]?.includes(index)) {
+                    button.classList.add("selected");
+                }
+                answersContainer.appendChild(button);
+            });
+            updateNavBar();
+            updateNavigationButtons();
+        }
+        
+        function selectAnswer(index, button) {
+            const maxSelections = 2 + currentQuestionIndex;
+            if (!selectedAnswers[currentQuestionIndex]) {
+                selectedAnswers[currentQuestionIndex] = [];
+            }
+            
+            if (selectedAnswers[currentQuestionIndex].includes(index)) {
+                selectedAnswers[currentQuestionIndex] = selectedAnswers[currentQuestionIndex].filter(i => i !== index);
+                button.classList.remove("selected");
+            } else {
+                if (selectedAnswers[currentQuestionIndex].length < maxSelections) {
+                    selectedAnswers[currentQuestionIndex].push(index);
+                    button.classList.add("selected");
+                } else {
+                    errorMessage.textContent = `Ne možete izabrati više od ${maxSelections} odgovora!`;
+                    errorMessage.style.display = "block";
+                    setTimeout(() => { errorMessage.style.display = "none"; }, 2000);
+                }
+            }
+            checkAllAnswered();
+            updateProgressBar();
+        }
+        
+        function goToQuestion(index) {
+            currentQuestionIndex = index;
+            showQuestion();
+        }
+        
+        function updateNavigationButtons() {
+            prevButton.classList.toggle("hidden", currentQuestionIndex === 0);
+            nextButton.classList.toggle("hidden", currentQuestionIndex === questions.length - 1);
+        }
+        
+        nextButton.addEventListener("click", () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                goToQuestion(currentQuestionIndex + 1);
+            }
+        });
+        
+        prevButton.addEventListener("click", () => {
+            if (currentQuestionIndex > 0) {
+                goToQuestion(currentQuestionIndex - 1);
+            }
+        });
+        
+        function checkAllAnswered() {
+            if (selectedAnswers.every(ans => ans && ans.length > 0)) {
+                showResultButton.classList.remove("hidden");
+            } else {
+                showResultButton.classList.add("hidden");
+            }
+        }
+        function showResults() {
+            let resultText = "<h2>Rezultati</h2><ul>";
+            questions.forEach((q, index) => {
+                resultText += `${q.question}, Vaš odabir: ${selectedAnswers[index]?.map(i => q.answers[i]).join(", ") || "Nema odgovora"}<br>`;
+            });
+            resultText += "Potrebno vrijeme: "+document.getElementById("timer").textContent + "</ul>";
+            document.body.innerHTML = resultText;
+        }
+        
+        showResultButton.addEventListener("click", showResults);
+        
+        setupNavBar();
+        showQuestion();
+    </script>
+</body>
+</html>

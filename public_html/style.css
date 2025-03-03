@@ -1,0 +1,110 @@
+body {
+    background-color: grey;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+.container {
+    display: flex;
+}
+.nav-bar {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+}
+.nav-bar button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: #ddd;
+    transition: background-color 0.3s ease;
+}
+.nav-bar button.active {
+    background-color: orange;
+    color: white;
+}
+.nav-bar button.answered {
+    background-color: green;
+    color: white;
+}
+.quiz-content {
+    flex-grow: 1;
+    position: relative;
+}
+.question {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+.answers button {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #333;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+.answers button.selected {
+    background-color: orange;
+    color: white;
+}
+.hidden {
+    display: none;
+}
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    display: none;
+}
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.progress-bar {
+    height: 10px;
+    background: lightgray;
+    width: 100%;
+    margin-top: 20px;
+    position: relative;
+}
+.progress {
+    height: 100%;
+    background: green;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+button {
+  background-color: white;
+  color: black;
+  border: none; 
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none; 
+  display: inline-block; 
+  font-size: 16px; 
+  margin: 4px 2px; 
+  cursor: pointer; 
+  border-radius: 8px; 
+  transition: background-color 0.3s ease; 
+}
+
+button:hover {
+  background-color: #45a049; 
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 128, 0, 0.6); 
+}
+
+.timer {
+    font-size: 2em;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
